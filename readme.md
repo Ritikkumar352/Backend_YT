@@ -2,3 +2,9 @@
 
 
 # Ritik
+
+
+app -> express
+
+DB - mongoose
+

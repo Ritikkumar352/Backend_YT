@@ -15,15 +15,30 @@ app.use(express.static("public"))
 app.use(cookieParser()) //to store and read cookies from user's browser
 
 
-//not showing both
-app.get("/", (req, res) => {
-  res.send("host is ready");
-});
-app.get("/login", (req, res) => {
-    res.send("<h1>hellooooow</h1>");
-  });
+//routes import
+
+import userRouter from "./routes/user.routes.js"
+
+
+//routes declaration
+
+
+app.use("/api/v1/users",userRouter)
+
+// https://localhost:8000/api/v1/users/register
+
+
 
 
 export {app}
+//not showing both
+// app.get("/", (req, res) => {
+//   res.send("host is ready");
+// });
+// app.get("/login", (req, res) => {
+//     res.send("<h1>hellooooow</h1>");
+//   });
+
+
 
 // or export default app

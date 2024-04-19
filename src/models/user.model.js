@@ -1,10 +1,10 @@
 import mongoose, { Schema } from "mongoose";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 
 const userSchema = new Schema({
-  user: {
+  user: {    // username: ?? check in hitesh's repo code ---> username
     type: String,
     required: true,
     uniquie: true,
@@ -19,7 +19,7 @@ const userSchema = new Schema({
     lowercase: true,
     trim: true,
   },
-  fullname: {
+  fullname: {    // fullName ??  --> if changed, do change in another files also
     type: String,
     required: true,
     trim: true,

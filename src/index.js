@@ -12,7 +12,7 @@ import { app } from "./app.js";
 // import express from "express";
 // const app=express()
 dotenv.config({
-  path: "./env",
+  path: "./.env",  //fixed /.env --- it was /env
 });
 
 // second approach (better)

@@ -26,4 +26,3 @@ const uploadOnCloudinary = async (localFilePath) => {
 };
 
 export { uploadOnCloudinary };
-// time stamp for this code 9:13:02 ...

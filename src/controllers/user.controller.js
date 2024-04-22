@@ -81,10 +81,4 @@ const registerUser = asyncHandler(async (req, res) => {
     );
 });
 
-export { registerUser };
-
-// const registerUser = asyncHandler(async (req, res) => {
-// res.status(200).json({
-// message: "hello ritikkkkkk",
-// });
-// });
+export { registerUser, };

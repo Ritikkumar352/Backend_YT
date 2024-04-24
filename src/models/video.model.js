@@ -41,6 +41,4 @@ const videoSchema = new Schema(
   }
 );
 
-
-
 export const Video = mongoose.model("video", videoSchema);

@@ -19,7 +19,7 @@ const registerUser = asyncHandler(async (req, res) => {
   console.log(email);
   console.log(username);
   console.log(fullname);
-
+  console.log(password);
   // if(fullname===""){
   //   throw new ApiError(400,"fullname is required");
   // }
@@ -35,7 +35,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const existedUser = await User.findOne({
     $or: [{ username }, { username }], // if found --> exixted user
   });
-  console.log(existedUser); // test could remove
+  console.log(existedUser+" is this showing null??"); // test could remove
   if (existedUser) {
     throw new ApiError(409, "User with same email or username already exist");
   }

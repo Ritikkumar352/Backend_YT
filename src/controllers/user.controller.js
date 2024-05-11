@@ -39,7 +39,7 @@ const registerUser = asyncHandler(async (req, res) => {
   if (existedUser) {
     throw new ApiError(409, "User with same email or username already exist");
   }
-
+// chcek this line 43 and 44
   const avatarLocalPath = req.files?.avatar[0]?.path; // optional check
   const coverImageLocalPath = req.files?.coverImage[0]?.path;
 

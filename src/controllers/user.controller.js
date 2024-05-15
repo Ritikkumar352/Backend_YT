@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
-import { ApiResponse } from "../utils//ApiResponse.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 
 const generateAccessAndRefereshTokens = async(userId)=>{
   try{
@@ -111,10 +111,12 @@ if(registerUser.files && Array.isArray(req.files.coverImage) && req.files.coverI
 });
 
 //register user above
-//login user code below   ***LOGIN****
+//login user code below   
+
+// ***LOGIN****
 
 const loginUser=asyncHandler(async(req,res)=>{
-    // to-do
+    // ToDo:-
     // req body se data lana h
     // find the user
     // password check
@@ -177,8 +179,29 @@ const loginUser=asyncHandler(async(req,res)=>{
 
 // ***LOG OUT***
 
-const logoutUser=asyncHandler(async(req,res)=>{
-  User.findById
+const logoutUser=asyncHandler(async(req,res)=>{    // if res is unused we can write '_' --->  c(req,_) 
+    await User.findByIdAndUpdate(
+      req.userId._id,
+      {
+        $set:{
+          refreshToken:undefined
+        }
+      },
+    {
+        new:true
+      }
+    )
+
+    const options={
+      httpOnly:true,
+      secure:true  // disables modifying cookies from frontend , only from server
+    }
+
+    return res
+    .status(200)
+    .clearCookie("accessToken",options)
+    .clearCookie("refreshToken",options)
+    .json(new ApiResponse(200,{},"User logged Out"))
 })
 
 
@@ -188,7 +211,8 @@ const logoutUser=asyncHandler(async(req,res)=>{
 
 export { 
   registerUser,
-  loginUser
+  loginUser,
+  logoutUser
 };
 
 // const registerUser = asyncHandler(async (req, res) => {

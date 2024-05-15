@@ -42,7 +42,7 @@ router.route("/register").post(
 router.route("/login").post(loginUser)
 
 
-// secure rout --> LOGOT
+// secured routes --> LOGOT
 
 router.route("").post(verifyJWT,logoutUser)
 

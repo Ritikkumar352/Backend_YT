@@ -6,11 +6,12 @@ class ApiError extends Error {
     stack = ""
   ) {
     super(message);
-    this.statusCode = stackCode;
+    this.statusCode = statusCode;  
+    //console.log("if stackCode not defined  --> check Api error line 9")
     this.data = null;
     this.message = message;
     this.success = false;
-    this.errror = errors;
+    this.error = errors;
 
     if (stack) {
       this.stack = stack;

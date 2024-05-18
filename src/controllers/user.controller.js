@@ -4,25 +4,74 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-const generateAccessAndRefereshTokens = async (userId) => {
+const generateAccessAndRefreshTokens = async (userId) => {
+  let user;
   try {
-    const user = await User.findById(userId);
-    const accessToken = user.generateAccessToken();
-    const refreshToken = user.generateRefreshToken();
+    user = await User.findById(userId);
+    if (!user) {
+      console.log("line number 12");  // console line for debugging
+      throw new ApiError(404, "user not found");
+    }
+  } catch (error) {
+    console.log("line number 15");
+    throw new ApiError(500, "Error finding user", [], error.stack);
+  }
 
+  let accessToken;
+  try {
+    accessToken = user.generateAccessToken();
+  } catch (error) {
+    console.log("line number 23");
+    throw new ApiError(500, "Error generating access token", [], error.stack);
+  }
+
+  let refreshToken;
+  try {
+    refreshToken = user.generateRefreshToken();
+  } catch (error) {
+    console.log("line number 32");
+    throw new ApiError(500, "Error generating refresh token", [], error.stack);
+  }
+
+  try {
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
-
-    return { accessToken, refreshToken };
   } catch (error) {
+    console.log("line number 40");
     throw new ApiError(
       500,
-      "something went wrong while generating referesh and access token "
+      "Error saving user with refresh token",
+      [],
+      error.stack
     );
   }
+
+  return { accessToken, refreshToken };
 };
 
+// now this below and above both code is working -->  :-)
+
+// const generateAccessAndRefreshTokens = async (userId) => {
+//   try {
+//     const user = await User.findById(userId);
+//     const accessToken = user.generateAccessToken();
+//     const refreshToken = user.generateRefreshToken();
+
+//     user.refreshToken = refreshToken;
+//     await user.save({ validateBeforeSave: false });
+
+//     return { accessToken, refreshToken };
+//   } catch (error) {
+//     throw new ApiError(
+//       500,
+//       "something went wrong while generating refresh and access token "
+//     );
+
+//   }
+// };
+
 const registerUser = asyncHandler(async (req, res) => {
+  // flow of regestration
   // get user detalis from user-- required in user model
   // validation
   // check if already registered or not
@@ -63,17 +112,17 @@ const registerUser = asyncHandler(async (req, res) => {
   // chcek this line 43 and 44
   const avatarLocalPath = req.files?.avatar[0]?.path; // optional check
 
-  //  const coverImageLocalPath = req.files?.coverImage[0]?.path;
+   const coverImageLocalPath = req.files?.coverImage[0]?.path;
 
-  //new lines below
-  let coverImageLocalPath;
-  if (
-    registerUser.files &&
-    Array.isArray(req.files.coverImage) &&
-    req.files.coverImage.length > 0
-  ) {
-    coverImageLocalPath = req.files.coverImage[0].path;
-  }
+  //new lines below --> these lines below are not uploading cover image , but running coze it's optional
+  // let coverImageLocalPath;
+  // if (
+  //   registerUser.files &&
+  //   Array.isArray(req.files.coverImage) &&
+  //   req.files.coverImage.length > 0
+  // ) {
+  //   coverImageLocalPath = req.files.coverImage[0].path;
+  // }
   // new lines above
 
   if (!avatarLocalPath) {
@@ -84,7 +133,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
   if (!avatar) {
-    throw new ApiError("400", "Avatar file is required");
+    throw new ApiError("400", "Avatar upload failed");
   }
 
   const user = await User.create({
@@ -101,7 +150,10 @@ const registerUser = asyncHandler(async (req, res) => {
   );
 
   if (!createdUser) {
-    throw new ApiError(500, "Something went wrong while user register :-(");
+    throw new ApiError(
+      500,
+      "Something went wrong while user register :-( ritik!"
+    );
   }
 
   return res
@@ -130,7 +182,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const { email, username, password } = req.body;
 
-  if (!username || !email) {
+  if (!username && !email) {
+    // or use (!(username || email))
     throw new ApiError(400, "username or email is required");
   }
 
@@ -142,6 +195,16 @@ const loginUser = asyncHandler(async (req, res) => {
     $or: [{ username }, { email }], // mongodb operator $ ..array
   });
 
+  // for testing
+  if (user) {
+    console.log(
+      "user to mil gaya hai it's " +
+        user.username +
+        " and it's email is " +
+        user.email
+    );
+  }
+
   if (!user) {
     throw new ApiError(404, "User does not exist ");
   }
@@ -152,7 +215,7 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Invalid user credentials ");
   }
 
-  const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
+  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
     user._id
   );
 
@@ -198,7 +261,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     {
       new: true,
     }
-  )
+  );
 
   const options = {
     httpOnly: true,

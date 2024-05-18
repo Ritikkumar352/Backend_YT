@@ -9,7 +9,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
   try {
     user = await User.findById(userId);
     if (!user) {
-      console.log("line number 12");  // console line for debugging
+      console.log("line number 12"); // console line for debugging
       throw new ApiError(404, "user not found");
     }
   } catch (error) {
@@ -112,7 +112,7 @@ const registerUser = asyncHandler(async (req, res) => {
   // chcek this line 43 and 44
   const avatarLocalPath = req.files?.avatar[0]?.path; // optional check
 
-   const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  const coverImageLocalPath = req.files?.coverImage[0]?.path;
 
   //new lines below --> these lines below are not uploading cover image , but running coze it's optional
   // let coverImageLocalPath;
@@ -195,7 +195,7 @@ const loginUser = asyncHandler(async (req, res) => {
     $or: [{ username }, { email }], // mongodb operator $ ..array
   });
 
-  // for testing
+  // for testing console statements..
   if (user) {
     console.log(
       "user to mil gaya hai it's " +
@@ -253,17 +253,15 @@ const logoutUser = asyncHandler(async (req, res) => {
   // if res is unused we can write '_' --->  c(req,_)
 
   await User.findByIdAndUpdate(
-
     req.user._id,
     {
       $unset: {
-        refreshToken: 1  // remove field form document 
+        refreshToken: 1, // remove field form document
       },
     },
     {
       new: true,
     }
-    
   );
 
   const options = {

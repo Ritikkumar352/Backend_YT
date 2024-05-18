@@ -251,16 +251,19 @@ const loginUser = asyncHandler(async (req, res) => {
 
 const logoutUser = asyncHandler(async (req, res) => {
   // if res is unused we can write '_' --->  c(req,_)
+
   await User.findByIdAndUpdate(
-    req.userId._id,
+
+    req.user._id,
     {
-      $set: {
-        refreshToken: undefined,
+      $unset: {
+        refreshToken: 1  // remove field form document 
       },
     },
     {
       new: true,
     }
+    
   );
 
   const options = {

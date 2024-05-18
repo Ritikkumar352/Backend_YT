@@ -44,7 +44,7 @@ router.route("/login").post(loginUser)
 
 // secured routes --> LOGOT
 
-router.route("").post(verifyJWT,logoutUser)
+router.route("/logout").post(verifyJWT,logoutUser)
 
 
 

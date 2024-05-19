@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   let user;
@@ -276,7 +277,61 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged Out"));
 });
 
-export { registerUser, loginUser, logoutUser };
+// to refrest access tok
+
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  // get refresh token from cookies
+  // send it to server and renew acces token after refresh token of suer matches with the refresh token on server
+
+  const incomingRefreshToken =
+    req.cookies.refreshToken || req.body.refreshToken;
+
+  if (!incomingRefreshToken) {
+    throw new ApiError(401, "unauthorized request -> user.con");
+  }
+
+try {
+    const decodedToken = jwt.verify(
+      incomingRefreshToken,
+      process.env.ACCESS_TOKEN_SECRET,
+      REFRESH_TOKEN_SECRET
+    );
+    const user=await User.findById(decodedToken?._id)
+  
+    if (!user) {
+      throw new ApiError(401, "Invalid refresh token -> user.con");
+    }
+  
+    if(incomingRefreshToken!==user?.refreshToken){
+      throw new ApiError(401, " refresh token is expired -> user.con");
+    }
+  
+    const options={
+      httpOnly:true,
+      secure:true
+    }
+  
+    const {accessToken,newRefreshToken}=await  generateAccessAndRefreshTokens(user._id)
+  
+    return res
+    .status(200)
+    .cookie("accessToken",accessToken,options)
+    .cookie("refreshToken",newRefreshToken,options)
+    .json(
+      new ApiResponse(
+        200,
+        {accessToken,refreshToken:newRefreshToken},
+        "Access token refreshed successfully"
+      )
+    )
+} catch (error) {
+  throw new ApiError(401,error?.message || "Invalid refresh token -- try catch-- 326")
+  
+}
+
+});
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken };
 
 // const registerUser = asyncHandler(async (req, res) => {
 //   res.status(200).json({

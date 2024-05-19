@@ -1,6 +1,6 @@
 import { Router } from "express";
 import multer from "multer"; // add on 08/05/24
-import { loginUser, logoutUser, registerUser } from "../controllers/user.controller.js";
+import { loginUser, logoutUser, registerUser, refreshAccessToken } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
@@ -45,6 +45,7 @@ router.route("/login").post(loginUser)
 // secured routes --> LOGOT
 
 router.route("/logout").post(verifyJWT,logoutUser)
+router.route("/refresh-token").post(refreshAccessToken)
 
 
 

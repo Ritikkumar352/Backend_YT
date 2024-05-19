@@ -1,6 +1,11 @@
 import { Router } from "express";
 import multer from "multer"; // add on 08/05/24
-import { loginUser, logoutUser, registerUser, refreshAccessToken } from "../controllers/user.controller.js";
+import {
+  loginUser,
+  logoutUser,
+  registerUser,
+  refreshAccessToken,
+} from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
@@ -21,7 +26,6 @@ const upload = multer({ storage: storage });
 
 // app is running after add this block of code above
 
-
 router.route("/register").post(
   // code from here is crashing this app
   upload.fields([
@@ -39,31 +43,14 @@ router.route("/register").post(
 );
 // router.route("/login").post(login);
 
-router.route("/login").post(loginUser)
-
+router.route("/login").post(loginUser);
 
 // secured routes --> LOGOT
 
-router.route("/logout").post(verifyJWT,logoutUser)
-router.route("/refresh-token").post(refreshAccessToken)
-
-
+router.route("/logout").post(verifyJWT, logoutUser);
+router.route("/refresh-token").post(refreshAccessToken);
 
 export default router;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import {Router} from "express";
 // import { registerUser } from "../controllers/user.controller.js";

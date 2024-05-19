@@ -279,6 +279,8 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 // to refrest access tok
 
+// UPDATE
+
 const refreshAccessToken = asyncHandler(async (req, res) => {
   // get refresh token from cookies
   // send it to server and renew acces token after refresh token of suer matches with the refresh token on server
@@ -335,7 +337,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body; //  confirm passwowd if(!(new=confpass-->error))
-  const user = await User.findById(req.user?.id);
+  const user = await User.findById(req.user?._id);
   const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
 
   if (!isPasswordCorrect) {
@@ -356,6 +358,55 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     .json(200, req.user, "current user fetched successfully");
 });
 
+const updateAccountDetails = asyncHandler(async (req, res) => {
+  const { fullname, email } = req.body;
+  if (!fullname || !email) {
+    // && -- if both required
+    throw new ApiError(400, "All fields are required");
+  }
+
+  const user = User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        fullname,
+        email: email, // we can use in both ways
+      },
+    },
+    { new: true }
+  ).select("-password");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Account details updated successfully"));
+});
+
+const updateUserAvatar = asyncHandler(async (req, res) => {
+  const avatarLocalPath = req.file?.path;
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "Avatar file is mssing");
+  }
+
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+  if (!avatar.url) {
+    throw new ApiError(400, "Error while updating avatar");
+  }
+
+  const user=await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set:{
+          avatar:avatar.url
+      }
+    },
+    {
+      new:true
+    }
+
+  ).select("-password")
+
+});
+
 export {
   registerUser,
   loginUser,
@@ -363,6 +414,8 @@ export {
   refreshAccessToken,
   getCurrentUser,
   changeCurrentPassword,
+  updateAccountDetails,
+  updateUserAvatar
 };
 
 // const registerUser = asyncHandler(async (req, res) => {

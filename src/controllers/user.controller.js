@@ -276,7 +276,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     .clearCookie("refreshToken", options)
     .json(new ApiResponse(200, {}, "User logged Out"));
 });
-
+  
 // to refrest access tok
 
 // UPDATE
@@ -437,6 +437,9 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, user, "cover image updated successfully"));
 });
+
+// TODO-
+// Make a utility to delete uplaoed images -- udateavatar and cover image 
 
 export {
   registerUser,

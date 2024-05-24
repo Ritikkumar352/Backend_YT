@@ -450,6 +450,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 
   //2:50:00 re watch
 
+  //aggregation pipeline --> learn from MongoDB
+
   const channel = await User.aggregate([
     {
       $match: {
@@ -465,44 +467,52 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
       },
     },
     {
-      $lookup:{
-        from:"subscriptions",
-        localField:"_id",
-        foreignField:"subscriber",
-        as:"subscribedTo"
-      }
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "subscriber",
+        as: "subscribedTo",
+      },
     },
     {
-      $addFields:{
-        subscriberCount:{
-          $size:"subscribers"
+      $addFields: {
+        subscriberCount: {
+          $size: "subscribers",
         },
-        channelsSubscribedToCount:{
-          $size:"$subscribedTo"
+        channelsSubscribedToCount: {
+          $size: "$subscribedTo",
         },
-        isSubscribed:{
-            // complete this
-            subscribersCount:{
-              $size:"$subscribers"
-            }
-        }
-
-      }
-    }
+        isSubscribed: {
+          $cond: {
+            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+            then: true,
+            else: false,
+          },
+        },
+        $project: {
+          fullname: 1,
+          username: 1,
+          subscriberCount: 1,
+          channelsSubscribedToCount: 1,
+          avatar: 1,
+          coverImage: 1,
+          email: 1,
+          createdAt: 1,
+        },
+      },
+    },
   ]);
 
-  if(!channel?.length)
-    {
-      throw new ApiError(404,"channel does not exist");
-    }
+  console.log("channel console" + channel);
+  if (!channel?.length) {
+    throw new ApiError(404, "channel does not exist");
+  }
 
-    return res
+  return res
     .status(200)
     .json(
-      new ApiResponse(200,channel[0],"user channel fetched successfully")
-    )
-
-
+      new ApiResponse(200, channel[0], "user channel fetched successfully")
+    );
 });
 
 export {

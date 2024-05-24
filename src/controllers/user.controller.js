@@ -276,7 +276,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     .clearCookie("refreshToken", options)
     .json(new ApiResponse(200, {}, "User logged Out"));
 });
-  
+
 // to refrest access tok
 
 // UPDATE
@@ -439,7 +439,71 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 });
 
 // TODO-
-// Make a utility to delete uplaoed images -- udateavatar and cover image 
+// Make a utility to delete uplaoed images -- udateavatar and cover image
+
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+  const { username } = req.params;
+
+  if (!username?.trim) {
+    throw new ApiError(400, "username not found");
+  }
+
+  //2:50:00 re watch
+
+  const channel = await User.aggregate([
+    {
+      $match: {
+        username: username.toLowerCase(),
+      },
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subscribers",
+      },
+    },
+    {
+      $lookup:{
+        from:"subscriptions",
+        localField:"_id",
+        foreignField:"subscriber",
+        as:"subscribedTo"
+      }
+    },
+    {
+      $addFields:{
+        subscriberCount:{
+          $size:"subscribers"
+        },
+        channelsSubscribedToCount:{
+          $size:"$subscribedTo"
+        },
+        isSubscribed:{
+            // complete this
+            subscribersCount:{
+              $size:"$subscribers"
+            }
+        }
+
+      }
+    }
+  ]);
+
+  if(!channel?.length)
+    {
+      throw new ApiError(404,"channel does not exist");
+    }
+
+    return res
+    .status(200)
+    .json(
+      new ApiResponse(200,channel[0],"user channel fetched successfully")
+    )
+
+
+});
 
 export {
   registerUser,
@@ -451,6 +515,7 @@ export {
   updateAccountDetails,
   updateUserAvatar,
   updateUserCoverImage,
+  getUserChannelProfile,
 };
 
 // const registerUser = asyncHandler(async (req, res) => {

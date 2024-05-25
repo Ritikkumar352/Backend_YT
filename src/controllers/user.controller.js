@@ -571,6 +571,12 @@ const getWatchHistory = asyncHandler(async (req, res) => {
   )
 });
 
+//model for like, playlist 
+// Write Video upload controller
+// video model...
+// tweet model... 
+
+
 export {
   registerUser,
   loginUser,

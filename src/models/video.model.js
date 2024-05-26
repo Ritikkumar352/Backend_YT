@@ -41,4 +41,6 @@ const videoSchema = new Schema(
   }
 );
 
-export const Video = mongoose.model("video", videoSchema);
+videoSchema.plugin(mongooseAggregatePaginate);
+
+export const Video = mongoose.model("Video", videoSchema); // v->V change other ref
